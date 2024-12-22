@@ -1,79 +1,27 @@
 using EndlessTycoon.Core;
 using UnityEngine;
 
-public class StallSlot : MonoBehaviour
+namespace EndlessTycoon.TaskSystems
 {
-    private void Start()
+    public class StallSlot : MonoBehaviour
     {
-        SetCustomer(null);
-        SetStaff(null);
+        [SerializeField] private Transform customerPos;
+        [SerializeField] private Transform staffPos;
 
-    }
+        public CustomerSlotPosition CustomerPosition { get; private set; }
+        public SlotPosition StaffPosition { get; private set; }
 
-    [SerializeField] private Transform orderPos;
-    [SerializeField] private Character customer;
-
-    private bool hasCustomerIncoming;
-
-    public void SetCustomer(Character character)
-    {
-        customer = character;
-        hasCustomerIncoming = false;
-
-        if (customer != null)
+        private void Start()
         {
-            Debug.Log("hasCustomer");
+            Setup();
         }
-    }
 
-    public void SetHasCustomerIncoming(bool hasCustomerIncoming)
-    {
-        this.hasCustomerIncoming = hasCustomerIncoming;
-    }
-
-    public bool CustomerIsEmpty()
-    {
-        return customer == null && !hasCustomerIncoming;
-
-    }
-
-    public Transform GetOrderPos()
-    {
-        return orderPos;
-    }
-
-    // ================================================================================================
-
-    [SerializeField] private Transform stallStaffSlotPos;
-    [SerializeField] private Character staff;
-
-    private bool hasStaffIncoming;
-
-    public void SetStaff(Character character)
-    {
-        staff = character;
-        hasStaffIncoming = false;
-
-        if (staff != null)
+        private void Setup()
         {
-            Debug.Log("hasStaff");
-
+            CustomerPosition = new CustomerSlotPosition(customerPos, this);
+            StaffPosition = new SlotPosition(staffPos, this);
         }
-    }
-
-    public void SetHasStaffIncoming(bool hasStaffIncoming)
-    {
-        this.hasStaffIncoming = hasStaffIncoming;
-    }
-
-    public bool StaffIsEmpty()
-    {
-        return staff == null && !hasStaffIncoming;
-
-    }
-
-    public Transform GetStaffSlotPos()
-    {
-        return stallStaffSlotPos;
     }
 }
+
+

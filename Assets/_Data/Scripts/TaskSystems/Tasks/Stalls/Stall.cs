@@ -1,10 +1,59 @@
 using System.Collections.Generic;
+using EndlessTycoon.Core;
+using EndlessTycoon.LevelGrids;
 using UnityEngine;
 
-public class Stall : MonoBehaviour
+namespace EndlessTycoon.TaskSystems
 {
-    public StallSlot stallSlot;
-    public Transform staffParent;
-    public Counter counter;
-    
+    public class Stall : MonoBehaviour
+    {
+        [SerializeField] private Transform staffParent;
+        [SerializeField] private Transform slotParent;
+        [SerializeField] private Counter counter;
+
+        private List<StallSlot> listStallSlot = new List<StallSlot>();
+
+        private void Start()
+        {
+            Setup();
+        }
+
+        private void Setup()
+        {
+            foreach (Transform tr in slotParent)
+            {
+                StallSlot stallSlot = tr.GetComponent<StallSlot>();
+                listStallSlot.Add(stallSlot);
+            }
+        }
+
+        public List<StallSlot> GetListStallSlot()
+        {
+            return listStallSlot;
+        }
+
+        public StallSlot GetRandomStallSlot()
+        {
+            List<StallSlot> stallSlotEmpty = new List<StallSlot>();
+
+            foreach (StallSlot slot in listStallSlot)
+            {
+                if (slot.CustomerPosition.IsEmpty())
+                {
+                    stallSlotEmpty.Add(slot);
+                }
+            }
+
+            if (stallSlotEmpty.Count <= 0) return null;
+
+            return stallSlotEmpty[Random.Range(0, stallSlotEmpty.Count)];
+        }
+
+        public void AddStaff()
+        {
+            Vector3 pos = LevelGrid.Instance.GetCorectWorldPosition(staffParent.position);
+            Character staff = CharacterManager.Instance.CreateStaff(pos, staffParent);
+            TaskManager.Instance.SetupStaffTask(staff);
+        }
+    }
 }

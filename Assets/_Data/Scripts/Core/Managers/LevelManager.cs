@@ -6,16 +6,24 @@ namespace EndlessTycoon.Core
 {
     public class LevelManager : Singleton<LevelManager>
     {
-        [SerializeField] private Transform startPos;
-        public Transform endPos;
-        [SerializeField] private Stall stall;
 
+        public Transform startPos;
+        public Transform endPos;
+
+        [SerializeField] private Stall stall;
+        [SerializeField] private int customerCount = 1;
 
         [NaughtyAttributes.Button]
         private void Initialize()
         {
-            // CreateCustomer();
-            CreateStaff();
+            stall.AddStaff();
+
+            for (int i = 0; i < 5; i++)
+            {
+                CreateCustomer();
+
+                GotoStall();
+            }
         }
 
         private void CreateCustomer()
@@ -25,67 +33,69 @@ namespace EndlessTycoon.Core
             TaskManager.Instance.SetupCustomerTask(customer);
         }
 
-        private void CreateStaff()
-        {
-            Vector3 pos = LevelGrid.Instance.GetCorectWorldPosition(stall.staffParent.position);
-            Character staff = CharacterManager.Instance.CreateStaff(pos, stall.staffParent);
-            TaskManager.Instance.SetupStaffTask(staff);
-
-            Character staff1 = CharacterManager.Instance.CreateStaff(pos, stall.staffParent);
-            TaskManager.Instance.SetupStaffTask(staff1);
-        }
-
-
-
         [NaughtyAttributes.Button]
         public void GotoStall()
         {
-            CreateCustomer();
-            CustomerTask task = new CustomerTask.Order
+            TaskManager.Instance.TaskSystemCustomer.EnqueueTask(() =>
             {
-                stallSlotPos = stall.stallSlot.GetOrderPos().position,
-                order = (character) =>
+                if (customerCount > 0)
                 {
-                    TakeOrder(character);
-                    character.goneStall = true;
-                }
-            };
+                    StallSlot slot = stall.GetRandomStallSlot();
 
-            TaskManager.Instance.TaskSystemCustomer.AddTask(task);
-        }
-
-        private void TakeOrder(Character customer)
-        {
-
-            TaskManager.Instance.TaskSystemStaff.EnqueueTask(() =>
-            {
-                if (stall.stallSlot.StaffIsEmpty())
-                {
-                    Debug.Log("Staff null");
-
-                    stall.stallSlot.SetHasCustomerIncoming(true);
-
-                    StallTask task = new StallTask.TakeOrder
+                    if (slot != null)
                     {
-                        stallSlotPos = stall.stallSlot.GetStaffSlotPos().position,
-                        takeOrder = (staff) =>
+                        customerCount--;
+                        slot.CustomerPosition.SetHasCharacterIncoming(true);
+                        CustomerTask task = new CustomerTask.Order
                         {
-                            staff.GetComponent<DisplayProgress>().StartProgression(1f, () =>
+                            stallSlotPos = slot.CustomerPosition.GetPosition(),
+                            order = (character) =>
                             {
-                                customer.GetComponent<DisplayOrder>().ToggleOrderItem(true);
-                                Deliver(customer);
-                            });
-                        }
-                    };
+                                slot.CustomerPosition.SetCharacter(character);
+                                Debug.Log("set character");
+                            }
+                        };
 
-                    return task;
+                        return task;
+                    }
                 }
-
                 return null;
             });
         }
 
+        /*
+         private void TakeOrder(Character customer)
+         {
 
+             TaskManager.Instance.TaskSystemStaff.EnqueueTask(() =>
+             {
+                 if (stall.stallSlot.StaffIsEmpty())
+                 {
+                     Debug.Log("Staff null");
+
+                     stall.stallSlot.SetHasCustomerIncoming(true);
+
+                     StallTask task = new StallTask.TakeOrder
+                     {
+                         stallSlotPos = stall.stallSlot.GetStaffSlotPos().position,
+                         takeOrder = (staff) =>
+                         {
+                             staff.GetComponent<DisplayProgress>().StartProgression(1f, () =>
+                             {
+                                 customer.GetComponent<DisplayOrder>().ToggleOrderItem(true);
+                                 Deliver(customer);
+                             });
+                         }
+                     };
+
+                     return task;
+                 }
+
+                 return null;
+             });
+         }
+
+         /*
         private void Deliver(Character customer)
         {
             TaskManager.Instance.TaskSystemStaff.EnqueueTask(() =>
@@ -116,6 +126,7 @@ namespace EndlessTycoon.Core
                 return null;
             });
         }
+        */
 
     }
 }
