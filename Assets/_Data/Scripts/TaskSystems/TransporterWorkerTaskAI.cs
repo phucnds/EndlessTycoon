@@ -14,7 +14,7 @@ namespace EndlessTycoon.TaskSystems
 
         private MoveAction moveAction;
         
-        private TaskSystem<TaskManager.TransporterTask> taskSystem;
+        private TaskSystem<TaskHandler.TransporterTask> taskSystem;
 
         private State state;
         private float waitingTimer;
@@ -44,7 +44,7 @@ namespace EndlessTycoon.TaskSystems
             }
         }
 
-        public void Setup(TaskSystem<TaskManager.TransporterTask> taskSystem)
+        public void Setup(TaskSystem<TaskHandler.TransporterTask> taskSystem)
         {
             state = State.WaitingForNextTask;
             this.taskSystem = taskSystem;
@@ -53,7 +53,7 @@ namespace EndlessTycoon.TaskSystems
         private void RequestNextTask()
         {
             Debug.Log("RequestNextTask");
-            TaskManager.TransporterTask task = taskSystem.RequestNextTask();
+            TaskHandler.TransporterTask task = taskSystem.RequestNextTask();
             if (task == null)
             {
                 state = State.WaitingForNextTask;
@@ -62,16 +62,16 @@ namespace EndlessTycoon.TaskSystems
             {
                 state = State.ExecutingTask;
 
-                if (task is TaskManager.TransporterTask.TakeCubeFromSlotToPosition)
+                if (task is TaskHandler.TransporterTask.TakeCubeFromSlotToPosition)
                 {
-                    ExecuteTask_TakeCubeFromSlotToPosition(task as TaskManager.TransporterTask.TakeCubeFromSlotToPosition);
+                    ExecuteTask_TakeCubeFromSlotToPosition(task as TaskHandler.TransporterTask.TakeCubeFromSlotToPosition);
                     return;
                 }
 
             }
         }
 
-        private void ExecuteTask_TakeCubeFromSlotToPosition(TaskManager.TransporterTask.TakeCubeFromSlotToPosition takeCubeFromCubeSlot)
+        private void ExecuteTask_TakeCubeFromSlotToPosition(TaskHandler.TransporterTask.TakeCubeFromSlotToPosition takeCubeFromCubeSlot)
         {
             Debug.Log("ExecuteTask_TakeCubeFromSlotToPosition");
 

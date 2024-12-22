@@ -1,3 +1,4 @@
+using Unity.Collections;
 using UnityEngine;
 
 namespace EndlessTycoon.Core
@@ -6,9 +7,18 @@ namespace EndlessTycoon.Core
     {
         [SerializeField] private Animator anim;
 
+        private float moveDir = 0;
+
         private void Start()
         {
             Setup();
+        }
+
+        private void Update()
+        {
+            float x = transform.position.x;
+            anim.GetComponent<SpriteRenderer>().flipX = x < moveDir;
+            moveDir = x;
         }
 
         private void Setup()

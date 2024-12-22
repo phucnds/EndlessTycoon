@@ -7,7 +7,7 @@ namespace EndlessTycoon.LevelGrids
     {
         
         private const int MOVE_STRAIGHT_COST = 10;
-        private const int MOVE_DIAGONAL_COST = 140;
+        private const int MOVE_DIAGONAL_COST = 14;
 
         [SerializeField] private Transform gridDebugPrefab;
         [SerializeField] private LayerMask obstaclesLayerMark;

@@ -13,19 +13,26 @@ namespace EndlessTycoon.TaskSystems
         }
 
         private MoveAction moveAction;
-        private TaskSystem<TaskManager.Task> taskSystem;
+        private TaskSystem<TaskHandler.Task> taskSystem;
 
         private State state;
         private float waitingTimer;
         private float waitingTimerMax = .2f;
 
-        private void Start()
+        private void Awake()
         {
             moveAction = GetComponent<MoveAction>();
         }
 
         private void Update()
         {
+            HandleState();
+        }
+
+        private void HandleState()
+        {
+            if (taskSystem == null) return;
+
             switch (state)
             {
                 case State.WaitingForNextTask:
@@ -42,7 +49,7 @@ namespace EndlessTycoon.TaskSystems
             }
         }
 
-        public void Setup(TaskSystem<TaskManager.Task> taskSystem)
+        public void Setup(TaskSystem<TaskHandler.Task> taskSystem)
         {
             state = State.WaitingForNextTask;
             this.taskSystem = taskSystem;
@@ -51,7 +58,7 @@ namespace EndlessTycoon.TaskSystems
         private void RequestNextTask()
         {
             Debug.Log("RequestNextTask");
-            TaskManager.Task task = taskSystem.RequestNextTask();
+            TaskHandler.Task task = taskSystem.RequestNextTask();
             if (task == null)
             {
                 state = State.WaitingForNextTask;
@@ -60,33 +67,33 @@ namespace EndlessTycoon.TaskSystems
             {
                 state = State.ExecutingTask;
 
-                if (task is TaskManager.Task.MoveToPostition)
+                if (task is TaskHandler.Task.MoveToPostition)
                 {
-                    ExecuteTask_MoveToPostition(task as TaskManager.Task.MoveToPostition);
+                    ExecuteTask_MoveToPostition(task as TaskHandler.Task.MoveToPostition);
                     return;
                 }
 
-                if (task is TaskManager.Task.Victory)
+                if (task is TaskHandler.Task.Victory)
                 {
-                    ExecuteTask_Victory(task as TaskManager.Task.Victory);
+                    ExecuteTask_Victory(task as TaskHandler.Task.Victory);
                     return;
                 }
 
-                if (task is TaskManager.Task.Gathering)
+                if (task is TaskHandler.Task.Gathering)
                 {
-                    ExecuteTask_Gathering(task as TaskManager.Task.Gathering);
+                    ExecuteTask_Gathering(task as TaskHandler.Task.Gathering);
                     return;
                 }
 
-                if (task is TaskManager.Task.TakeCubeToCubeSlot)
+                if (task is TaskHandler.Task.TakeCubeToCubeSlot)
                 {
-                    ExecuteTask_TakeCubeToCubeSlot(task as TaskManager.Task.TakeCubeToCubeSlot);
+                    ExecuteTask_TakeCubeToCubeSlot(task as TaskHandler.Task.TakeCubeToCubeSlot);
                     return;
                 }
             }
         }
 
-        private void ExecuteTask_TakeCubeToCubeSlot(TaskManager.Task.TakeCubeToCubeSlot takeCubeToCubeSlot)
+        private void ExecuteTask_TakeCubeToCubeSlot(TaskHandler.Task.TakeCubeToCubeSlot takeCubeToCubeSlot)
         {
             Debug.Log("ExecuteTask_TakeCubeToCubeSlot");
 
@@ -105,7 +112,7 @@ namespace EndlessTycoon.TaskSystems
             });
         }
 
-        private void ExecuteTask_Victory(TaskManager.Task.Victory victoryTask)
+        private void ExecuteTask_Victory(TaskHandler.Task.Victory victoryTask)
         {
             Debug.Log("ExecuteTask_Victory");
 
@@ -115,7 +122,7 @@ namespace EndlessTycoon.TaskSystems
             // });
         }
 
-        private void ExecuteTask_MoveToPostition(TaskManager.Task.MoveToPostition moveToPostitionTask)
+        private void ExecuteTask_MoveToPostition(TaskHandler.Task.MoveToPostition moveToPostitionTask)
         {
             Debug.Log("ExecuteTask_MoveToPostition");
 
@@ -126,7 +133,7 @@ namespace EndlessTycoon.TaskSystems
             });
         }
 
-        private void ExecuteTask_Gathering(TaskManager.Task.Gathering gatherTask)
+        private void ExecuteTask_Gathering(TaskHandler.Task.Gathering gatherTask)
         {
             Debug.Log("ExecuteTask_Gathering");
 

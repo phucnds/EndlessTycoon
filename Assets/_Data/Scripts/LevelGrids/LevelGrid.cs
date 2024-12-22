@@ -27,6 +27,12 @@ namespace EndlessTycoon.LevelGrids
 
         public Vector3 GetWorldPosition(GridPosition gridPosition) => gridSystem.GetWorldPosition(gridPosition);
 
+        public Vector3 GetCorectWorldPosition(Vector3 pos)
+        {
+            GridPosition gridPosition = GetGridPosition(pos);
+            return GetWorldPosition(gridPosition);
+        }
+
         public bool IsValidGridPosition(GridPosition gridPostition) => gridSystem.IsValidGridPosition(gridPostition);
 
         public int GetWidth() => gridSystem.GetWidth();
