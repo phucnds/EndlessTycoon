@@ -105,9 +105,11 @@ public class StaffBehaviour : MonoBehaviour
         GridPosition gridPosition = LevelGrid.Instance.GetGridPosition(deliverTask.counterPos);
         moveAction.TakeAction(gridPosition, () =>
         {
+            float speed = LevelManager.Instance.Stall.GetCounter().GetSpeed();
+
             deliverTask.reachedCounterSlot();
             GetComponent<CharacterAnimator>().StartDoing();
-            GetComponent<DisplayProgress>().StartProgression(3f, () =>
+            GetComponent<DisplayProgress>().StartProgression(speed, () =>
             {
                 GetComponent<CharacterAnimator>().StoptDoing();
                 deliverTask.doneProduce();

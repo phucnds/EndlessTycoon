@@ -1,3 +1,4 @@
+using System.Collections;
 using EndlessTycoon.LevelGrids;
 using EndlessTycoon.TaskSystems;
 using UnityEngine;
@@ -13,6 +14,18 @@ namespace EndlessTycoon.Core
         [field: SerializeField] public Stall Stall { get; private set; }
         [field: SerializeField] public int CustomerCount { get; private set; } = 1;
 
+
+        private void Start()
+        {
+            StartCoroutine(InitRoutine());
+        }
+
+        private IEnumerator InitRoutine()
+        {
+            yield return new WaitForSeconds(.6f);
+            Initialize();
+        }
+
         [NaughtyAttributes.Button]
         private void Initialize()
         {
@@ -26,22 +39,10 @@ namespace EndlessTycoon.Core
             }
         }
 
-        [NaughtyAttributes.Button]
+
         public void IncreaseCustomer()
         {
             CustomerCount++;
-        }
-
-        [NaughtyAttributes.Button]
-        public void IncreaseStaff()
-        {
-            Stall.AddStaff();
-        }
-
-        [NaughtyAttributes.Button]
-        public void AddCounterSlot()
-        {
-            Stall.GetCounter().AddSlot();
         }
 
         private void CreateCustomer()

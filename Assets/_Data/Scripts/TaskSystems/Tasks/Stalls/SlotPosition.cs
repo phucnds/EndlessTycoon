@@ -88,11 +88,14 @@ namespace EndlessTycoon.TaskSystems
                             takePayment = () =>
                             {
                                 customer.GetComponent<DisplayOrder>().ToggleOrderItem(false);
-                                Debug.Log("get money");
                                 customer.GetComponent<WaitingAction>().isWaiting = false;
                                 SetCharacter(null);
-
                                 LevelManager.Instance.NewCustomerComing();
+
+                                int money = stallSlot.GetStall().GetCounter().GetIncome();
+                                CurrencyManager.Instance.AddCurrency(money);
+                                EffectManager.Instance.SetText(customer.transform, money);
+                                SoundManager.Instance.PlaySFXCollectCoin();
                             }
                         };
 
