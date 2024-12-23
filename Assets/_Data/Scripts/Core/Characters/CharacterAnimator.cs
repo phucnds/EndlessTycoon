@@ -39,5 +39,15 @@ namespace EndlessTycoon.Core
         {
             anim.SetBool("isMoving", true);
         }
+
+        public void StartDoing()
+        {
+            anim.SetBool("isDoing", true);
+        }
+
+        public void StoptDoing()
+        {
+            anim.SetBool("isDoing", false);
+        }
     }
 }

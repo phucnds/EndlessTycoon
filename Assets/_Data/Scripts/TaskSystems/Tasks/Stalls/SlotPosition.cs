@@ -7,14 +7,12 @@ namespace EndlessTycoon.TaskSystems
     {
         private Transform slotTransform;
         private Character character;
-        protected StallSlot stallSlot;
 
         protected bool hasCharacterIncoming;
 
-        public SlotPosition(Transform slotTransform, StallSlot stallSlot)
+        public SlotPosition(Transform slotTransform)
         {
             this.slotTransform = slotTransform;
-            this.stallSlot = stallSlot;
             SetCharacter(null);
         }
 
@@ -44,8 +42,11 @@ namespace EndlessTycoon.TaskSystems
 
     public class CustomerSlotPosition : SlotPosition
     {
-        public CustomerSlotPosition(Transform slotTransform, StallSlot stallSlot) : base(slotTransform, stallSlot)
+        private StallSlot stallSlot;
+
+        public CustomerSlotPosition(Transform slotTransform, StallSlot stallSlot) : base(slotTransform)
         {
+            this.stallSlot = stallSlot;
         }
 
         public override void SetCharacter(Character character)
@@ -59,11 +60,8 @@ namespace EndlessTycoon.TaskSystems
                     stallSlotPos = stallSlot.StaffPosition.GetPosition(),
                     takeOrder = (staff) =>
                     {
-                        staff.GetComponent<DisplayProgress>().StartProgression(1f, () =>
-                        {
-                            character.GetComponent<DisplayOrder>().ToggleOrderItem(true);
-                            Debug.Log("deliver");
-                        });
+                        character.GetComponent<DisplayOrder>().ToggleOrderItem(true);
+                        Deliver(staff, character);
                     }
                 };
 
@@ -71,12 +69,50 @@ namespace EndlessTycoon.TaskSystems
             }
         }
 
+        private void Deliver(Character staff, Character customer)
+        {
+            TaskManager.Instance.TaskSystemStaff.EnqueueTask(() =>
+            {
+                foreach (CounterSlot slot in stallSlot.GetStall().GetCounter().GetList())
+                {
+                    if (slot.StaffPosition.IsEmpty())
+                    {
+                        slot.StaffPosition.SetHasCharacterIncoming(true);
+
+                        StallTask task = new StallTask.Deliver
+                        {
+                            counterPos = slot.StaffPosition.GetPosition(),
+                            stallSlotPos = stallSlot.StaffPosition.GetPosition(),
+                            reachedCounterSlot = () => { slot.StaffPosition.SetCharacter(staff); },
+                            doneProduce = () => { slot.StaffPosition.SetCharacter(null); },
+                            takePayment = () =>
+                            {
+                                customer.GetComponent<DisplayOrder>().ToggleOrderItem(false);
+                                Debug.Log("get money");
+                                customer.GetComponent<WaitingAction>().isWaiting = false;
+                                SetCharacter(null);
+
+                                LevelManager.Instance.NewCustomerComing();
+                            }
+                        };
+
+                        return task;
+                    }
+                }
+
+                return null;
+            });
+        }
+
     }
 
     public class StaffSlotPosition : SlotPosition
     {
-        public StaffSlotPosition(Transform slotTransform, StallSlot stallSlot) : base(slotTransform, stallSlot)
+        private StallSlot stallSlot;
+
+        public StaffSlotPosition(Transform slotTransform, StallSlot stallSlot) : base(slotTransform)
         {
+            this.stallSlot = stallSlot;
         }
 
         public override void SetCharacter(Character character)
@@ -86,7 +122,7 @@ namespace EndlessTycoon.TaskSystems
             if (character != null)
             {
                 // StallTask task = new StallTask.Deliver {
-                    
+
                 // }
             }
         }

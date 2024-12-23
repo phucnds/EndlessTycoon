@@ -24,6 +24,7 @@ namespace EndlessTycoon.TaskSystems
             {
                 StallSlot stallSlot = tr.GetComponent<StallSlot>();
                 listStallSlot.Add(stallSlot);
+                stallSlot.SetStall(this);
             }
         }
 
@@ -53,7 +54,13 @@ namespace EndlessTycoon.TaskSystems
         {
             Vector3 pos = LevelGrid.Instance.GetCorectWorldPosition(staffParent.position);
             Character staff = CharacterManager.Instance.CreateStaff(pos, staffParent);
+            staff.GetComponent<CharacterVisual>().SetVisualStaff(staffParent.childCount - 1);
             TaskManager.Instance.SetupStaffTask(staff);
+        }
+
+        public Counter GetCounter()
+        {
+            return counter;
         }
     }
 }

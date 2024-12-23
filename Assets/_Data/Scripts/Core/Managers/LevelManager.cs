@@ -10,13 +10,13 @@ namespace EndlessTycoon.Core
         public Transform startPos;
         public Transform endPos;
 
-        [SerializeField] private Stall stall;
-        [SerializeField] private int customerCount = 1;
+        [field: SerializeField] public Stall Stall { get; private set; }
+        [field: SerializeField] public int CustomerCount { get; private set; } = 1;
 
         [NaughtyAttributes.Button]
         private void Initialize()
         {
-            stall.AddStaff();
+            Stall.AddStaff();
 
             for (int i = 0; i < 5; i++)
             {
@@ -26,11 +26,37 @@ namespace EndlessTycoon.Core
             }
         }
 
+        [NaughtyAttributes.Button]
+        public void IncreaseCustomer()
+        {
+            CustomerCount++;
+        }
+
+        [NaughtyAttributes.Button]
+        public void IncreaseStaff()
+        {
+            Stall.AddStaff();
+        }
+
+        [NaughtyAttributes.Button]
+        public void AddCounterSlot()
+        {
+            Stall.GetCounter().AddSlot();
+        }
+
         private void CreateCustomer()
         {
             Vector3 pos = LevelGrid.Instance.GetCorectWorldPosition(startPos.position);
             Character customer = CharacterManager.Instance.CreateCustomer(pos);
+            customer.GetComponent<CharacterVisual>().SetVisualCustomer();
             TaskManager.Instance.SetupCustomerTask(customer);
+        }
+
+        public void NewCustomerComing()
+        {
+            CreateCustomer();
+            IncreaseCustomer();
+            GotoStall();
         }
 
         [NaughtyAttributes.Button]
@@ -38,13 +64,13 @@ namespace EndlessTycoon.Core
         {
             TaskManager.Instance.TaskSystemCustomer.EnqueueTask(() =>
             {
-                if (customerCount > 0)
+                if (CustomerCount > 0)
                 {
-                    StallSlot slot = stall.GetRandomStallSlot();
+                    StallSlot slot = Stall.GetRandomStallSlot();
 
                     if (slot != null)
                     {
-                        customerCount--;
+                        CustomerCount--;
                         slot.CustomerPosition.SetHasCharacterIncoming(true);
                         CustomerTask task = new CustomerTask.Order
                         {
@@ -62,72 +88,6 @@ namespace EndlessTycoon.Core
                 return null;
             });
         }
-
-        /*
-         private void TakeOrder(Character customer)
-         {
-
-             TaskManager.Instance.TaskSystemStaff.EnqueueTask(() =>
-             {
-                 if (stall.stallSlot.StaffIsEmpty())
-                 {
-                     Debug.Log("Staff null");
-
-                     stall.stallSlot.SetHasCustomerIncoming(true);
-
-                     StallTask task = new StallTask.TakeOrder
-                     {
-                         stallSlotPos = stall.stallSlot.GetStaffSlotPos().position,
-                         takeOrder = (staff) =>
-                         {
-                             staff.GetComponent<DisplayProgress>().StartProgression(1f, () =>
-                             {
-                                 customer.GetComponent<DisplayOrder>().ToggleOrderItem(true);
-                                 Deliver(customer);
-                             });
-                         }
-                     };
-
-                     return task;
-                 }
-
-                 return null;
-             });
-         }
-
-         /*
-        private void Deliver(Character customer)
-        {
-            TaskManager.Instance.TaskSystemStaff.EnqueueTask(() =>
-            {
-                if (stall.counter.StaffIsEmpty())
-                {
-                    Debug.Log("Staff null");
-
-                    stall.stallSlot.SetHasCustomerIncoming(true);
-
-                    StallTask task = new StallTask.Deliver
-                    {
-                        counterPos = stall.counter.GetCounterPos().position,
-                        stallSlotPos = stall.stallSlot.GetStaffSlotPos().position,
-                        takePayment = () =>
-                        {
-                            customer.isWaiting = false;
-                            customer.GetComponent<DisplayOrder>().ToggleOrderItem(false);
-                            Debug.Log("get money");
-                            customer.GetComponent<WaitingAction>().isWaiting = false;
-                            GotoStall();
-                        }
-                    };
-
-                    return task;
-                }
-
-                return null;
-            });
-        }
-        */
-
     }
 }
 

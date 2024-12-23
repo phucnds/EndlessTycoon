@@ -8,6 +8,8 @@ namespace EndlessTycoon.TaskSystems
         [SerializeField] private Transform customerPos;
         [SerializeField] private Transform staffPos;
 
+        private Stall stall;
+
         public CustomerSlotPosition CustomerPosition { get; private set; }
         public SlotPosition StaffPosition { get; private set; }
 
@@ -19,7 +21,16 @@ namespace EndlessTycoon.TaskSystems
         private void Setup()
         {
             CustomerPosition = new CustomerSlotPosition(customerPos, this);
-            StaffPosition = new SlotPosition(staffPos, this);
+            StaffPosition = new StaffSlotPosition(staffPos, this);
+        }
+
+        public void SetStall(Stall stall)
+        {
+            this.stall = stall;
+        }
+        public Stall GetStall()
+        {
+            return stall;
         }
     }
 }

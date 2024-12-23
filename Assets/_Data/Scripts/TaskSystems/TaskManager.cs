@@ -16,13 +16,13 @@ namespace EndlessTycoon.TaskSystems
 
         public void SetupCustomerTask(Character character)
         {
-            CharacterTask characterTask = character.GetComponent<CharacterTask>();
+            CustomerBehaviour characterTask = character.GetComponent<CustomerBehaviour>();
             characterTask.Setup(TaskSystemCustomer);
         }
 
         public void SetupStaffTask(Character character)
         {
-            StaffTask characterTask = character.GetComponent<StaffTask>();
+            StaffBehaviour characterTask = character.GetComponent<StaffBehaviour>();
             characterTask.Setup(TaskSystemStaff);
         }
 

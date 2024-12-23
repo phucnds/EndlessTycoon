@@ -20,6 +20,8 @@ public class StallTask : BaseTask
     {
         public Vector3 counterPos;
         public Vector3 stallSlotPos;
+        public Action reachedCounterSlot;
+        public Action doneProduce;
         public Action takePayment;
     }
 }
